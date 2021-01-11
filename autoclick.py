@@ -17,39 +17,46 @@ def random_movement(max_h, max_w):
     print(pyautogui.position())
 
 
-pyautogui.FAILSAFE = True
-pyautogui.PAUSE = 0.5
-interval = 0.5
-session = True
+def clicker(interval, session, prompt_choice):
+    try:
+        if prompt_choice == 'LEFT':
+            max_height, max_width = screen_dimensions()
+            while session:
+                random_movement(max_height, max_width)
+                pyautogui.moveTo(10, 10, 2, pyautogui.easeOutQuad)
+                pyautogui.click(x=10, y=10, clicks=1, interval=interval, button='left')
 
-prompt_choice = pyautogui.confirm(text='Select which corner to click\n(end by moving your mouse to any corner of the '
-                                       'screen)', title='Auto-clicker', buttons=['LEFT', 'NO-CLICK', 'RIGHT'])
+        if prompt_choice == 'RIGHT':
+            max_height, max_width = screen_dimensions()
+            while session:
+                random_movement(max_height, max_width)
+                pyautogui.moveTo(max_width, 10, 2, pyautogui.easeOutQuad)
+                pyautogui.click(x=max_width, y=10, clicks=1, interval=interval, button='left')
 
-try:
-    if prompt_choice == 'LEFT':
-        max_height, max_width = screen_dimensions()
-        while session:
-            random_movement(max_height, max_width)
-            pyautogui.moveTo(10, 10, 2, pyautogui.easeOutQuad)
-            pyautogui.click(x=10, y=10, clicks=1, interval=interval, button='left')
+        if prompt_choice == 'NO-CLICK':
+            max_height, max_width = screen_dimensions()
+            while session:
+                random_movement(max_height, max_width)
 
-    if prompt_choice == 'RIGHT':
-        max_height, max_width = screen_dimensions()
-        while session:
-            random_movement(max_height, max_width)
-            pyautogui.moveTo(max_width, 10, 2, pyautogui.easeOutQuad)
-            pyautogui.click(x=max_width, y=10, clicks=1, interval=interval, button='left')
+    except pyautogui.FailSafeException as e:
+        pyautogui.alert("Script Completed - Fail-safe:\n\n%s" % e, 'Information')
+        sys.exit()
+    except KeyboardInterrupt as e:
+        pyautogui.alert("Script Completed - Keyboard Interrupt\n\n%s" % e, 'Information')
+        sys.exit()
 
-    if prompt_choice == 'NO-CLICK':
-        max_height, max_width = screen_dimensions()
-        while session:
-            random_movement(max_height, max_width)
 
-except pyautogui.FailSafeException as e:
-    pyautogui.alert("Completed Script - Fail-safe")
+def main():
+    pyautogui.FAILSAFE = True
+    pyautogui.PAUSE = 0.5
+    interval = 0.5
+    session = True
+    prompt_choice = pyautogui.confirm(text="Select which corner of the screen to click:\n(use CTRL-C or move the mouse "
+                                           "to any corner of the screen to end)",
+                                      title="Autoclick", buttons=['LEFT', 'NO-CLICK', 'RIGHT'])
+    clicker(interval, session, prompt_choice)
+
+
+if __name__ == '__main__':
+    main()
     sys.exit()
-except KeyboardInterrupt:
-    pyautogui.alert("Completed Script - Keyboard Interrupt")
-    sys.exit()
-
-sys.exit()
